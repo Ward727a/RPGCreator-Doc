@@ -15,6 +15,7 @@
     --ifm-color-primary-lightest: #81545c;
     --ifm-code-font-size: 95%;
     --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+    --tree-line-color: rgba(120, 120, 120, 0.4);
 }
 
 a{
@@ -35,4 +36,68 @@ nav a{
     --ifm-color-primary-lighter: #cdc3b1;
     --ifm-color-primary-lightest: #e0dacf;
     --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+    --tree-line-color: rgba(200, 200, 200, 0.2);
+}
+
+/* ====================== */
+/* Folder Tree structure  */
+/* ====================== */
+.tree ul {
+    list-style: none;
+    position: relative;
+    padding-left: 1.5em;
+    margin: 0;
+}
+
+.tree ul::before {
+    content: '';
+    border-left: 2px solid var(--tree-line-color);
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0.4em;
+}
+
+.tree li {
+    margin: 0.5em 0;
+    position: relative;
+    padding-left: 0.5em;
+}
+
+.tree li::before {
+    content: '';
+    border-top: 2px solid var(--tree-line-color);
+    position: absolute;
+    top: 1em;
+    left: -1em;
+    width: 1.2em;
+}
+
+/* Folder name and description */
+.tree b {
+    color: var(--ifm-color-primary);
+}
+
+/* Clickable folder area */
+.tree-item {
+    cursor: pointer;
+    user-select: none;
+    display: inline-block;
+    border-radius: 6px;
+    padding: 2px 4px;
+    transition: background-color 0.15s ease;
+}
+
+/* Hover effect for folder names */
+.tree-item:hover:has(span:first-child) {
+    background-color: rgba(127, 127, 127, 0.1);
+}
+
+/* Folder toggle arrows (▶ ▼) */
+.tree .tree-item span:first-child {
+    display: inline-block;
+    width: 1em;
+    text-align: center;
+    margin-right: 0.3em;
+    font-weight: bold;
 }
