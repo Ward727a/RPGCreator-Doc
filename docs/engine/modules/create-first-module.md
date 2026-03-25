@@ -74,6 +74,10 @@ using RPGCreator.SDK.Logging; // This is the namespace for the logging system of
     Incompatibilities: []
 )]
 
+// This is the main class of your module, it should inherit from the BaseModule class defined in the SDK,
+// and should be 'public' so the engine can access it, and should have a parameterless constructor (which is the default constructor).
+//
+// Here we do not define a parameterless constructor, because the default constructor is a parameterless constructor, so it's not needed to be defined.
 public class MyModule : BaseModule
 {
     // Here, you can override the methods of the BaseModule class to add functionnality,

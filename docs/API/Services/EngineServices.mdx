@@ -1,0 +1,86 @@
+﻿---
+sidebar_position: 1
+---
+
+# Engine Services
+
+The `EngineServices` are the main services of the engine, they are defined by the `RPGCreator.Core` project, and are used to access cores features of the engine.
+
+:::warning
+The current API is still in Alpha, and could change during development!
+:::
+
+:::info
+This page still need to be completed.<br/>
+For now it's listing all services, with small description of their utility.<br/>
+More information will be added at a later date.
+:::
+
+## List of services
+
+### Config
+The config service allow the engine to manage his config system.<br/>
+It can also be used by module to define their own config files.
+
+### AssetsManager
+A service that manages the assets of the engine, like loading, adding, saving, deleting, and more. It also manages the assets pack.
+
+### GameFactory
+:::warning
+Please, do not use. This is a service that will very probably be removed soon.<br/>
+It's kept for now, but if no utility is found for it, it <b>will</b> be removed.
+:::
+
+### Serializer
+The `Serializer` is the service that manage all serialization process in the engine. Behind the scene, it's using Newtonsoft.Json.<br/>
+
+### Resources
+The `Resources` is the service that allow each parts of the engine to load custom resources from a file. For example, it's used by the UI to load `Avalonia.[...].Bitmap` class from an image file path.
+
+### ProjectsManager
+This is where the engine manage the projects. Like - but not limited to - Creating, load, remove,...
+
+### GraphService
+:::warning
+This service is currently in a VERY ALPHA PHASE!!<br/>
+This is not recommended to use, as the API for it <b>WILL CHANGE</b>!
+:::
+### GraphNodeScanner
+:::warning
+This service is currently in a VERY ALPHA PHASE!!<br/>
+This is not recommended to use, as the API for it <b>WILL CHANGE</b>!
+:::
+### PrattFormulaService
+:::warning
+This service is currently in a VERY ALPHA PHASE!!<br/>
+This is not recommended to use, as the API for it <b>WILL CHANGE</b>!
+:::
+
+### UndoRedoService
+A service that allow the engine to manage its undo/redo easily by using custom command.
+
+### InputsService
+A service that manage all inputs related feature inside the engine.
+
+### ModulePathResolver
+A service made for modules. It allows module to register a path linked to an `Urn`. This can be used, for example, to allow other module to 'use' a file, or a folder, defined by a module.
+:::info
+This will be **maybe** be changed to use the new Config service.
+:::
+
+### ModuleManager
+A service that manage all modules. It can be used by modules to know what modules are loaded, and what modules are started currently.
+:::warning
+Please be careful, there is a lots of engine protected methods in this service!
+:::
+
+### FeatureManager
+A service that manage all features (entity, world, game) currently inside the engine. This can be used by modules to add their own features.
+
+### GamePlayerService
+A service that manage the **GAME** player (where the project will be started and launched).<br/>
+This allows, for example, to start the current project inside a new window that is using the `RPGCreator.Player` project.
+
+### Scheduler
+A service that allows the engine (and modules) to schedule task every X seconds, or when a condition has been done.<br/>
+For example, the auto-saving of the configs use this service for that.

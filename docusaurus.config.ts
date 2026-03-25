@@ -191,6 +191,7 @@ const config: Config = {
       copyright: `Copyright © ${new Date().getFullYear()} RPG Creator under MIT License. Built with Docusaurus.`,
     },
     prism: {
+      additionalLanguages: ['csharp'],
       theme: prismThemes.github,
       darkTheme: prismThemes.dracula,
     },

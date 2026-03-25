@@ -1,0 +1,235 @@
+﻿---
+sidebar_position: 1
+---
+import {
+    CSType,
+    CSName,
+    CSDefault,
+    OptionalType,
+    CSClass,
+    CSConst,
+    CSFlagStatic,
+    CSFlagPublic
+} from '@site/src/components/CS';
+
+# Api References
+
+## Intro
+:::warning
+The current API is still in Alpha and could change during development!
+:::
+
+The API is managed by the SDK.
+
+The SDK is the main entry point for module developers and is used to create modules, but also by the engine itself. It's made in a way that it's dependency is as low as possible to not force module developers to multiply the size of their module.
+
+For the engine, we use a service locator pattern to access different parts of the engine. Each parts of the engine will define their service inside the SDK, and module developers can access these services to interact with the engine.
+
+We have four main service categories:
+- EngineServices: Those are the main services of the engine, they are defined by the `RPGCreator.Core` project, and are used to access cores features, like (but not limited to) `AssetsManager`, `SerializerService`, `UndoRedoService`,...
+- RuntimeServices: Those are the services related to the runtime (When the game is running), they are defined by two different projects in code, `RPGCreator.Player` and `RPGCreator.RTP`, and are used to access features related to the runtime, like (but not limited to) `MapService`, `LayerService`, `RenderService`, ...
+- EditorUIServices: Those are the services related to the editor UI, they are defined by the `RPGCreator.UI` project, and are used to edit, or interact with the editor UI, like (but not limited to) `DialogService`, `MenuService`, `ExtensionManager`, ...
+- RegistryServices: Those are the services related to the registry, they are defined by different projects, but mostly by the `RPGCreator.Core` and `RPGCreator.UI` projects, and are used to register different things, like (but not limited to): `AssetType`, `Action`, `Tool`, ...
+
+And with that, we also have the 'state' of the engine, which are accessed by:
+- GlobalStates: This is where the engine store all the global states of the engine, like `EngineMode`, `EditorState`, `ProjectState`, `MapState`,...
+
+:::info Philosophy
+By fragmenting the API this way, we ensure that modules have the same power as the engine's internal components. If the engine can do it, your module can too.
+:::
+
+## Global methods
+Those are methods that can be found in all four services (Engine, Runtime, EditorUi, Registry).
+
+### IsServiceReady\<T>
+Allow checking if a service is ready (registered) in the service provider.
+#### Flags
+<CSFlagPublic/><CSFlagStatic/>
+
+#### Parameters
+- <OptionalType/> <CSType>string</CSType> <CSName>groupName</CSName> = <CSDefault>"default"</CSDefault> <br/>The <CSName>groupName</CSName> of the service you want to check. <CSName>GroupName</CSName> are a way to have multiple same services loaded if needed.
+#### TypeParam
+- <CSType>Type</CSType> <CSName>&lt;T&gt;</CSName><br/>
+<CSName>&lt;T&gt;</CSName> need to be a <CSConst>class</CSConst>, heriting <CSClass>IService</CSClass>.
+
+#### Return
+- <CSType>bool</CSType><br/>
+<CSConst>True</CSConst> if the service is registered and ready, <CSConst>False</CSConst> otherwise.
+
+#### Example
+Let's imagine we have a service class declared like this:
+```CSharp
+public class MyServiceDummy : IService
+{}
+```
+We can do this to check if this class has been registered inside the <CSClass>EngineServices</CSClass>:
+```CSharp
+if(EngineServices.IsServiceReady<MyServiceDummy>())
+{
+}
+
+/// If we wanted to check if it was inside another groupe than 'default' we can:
+if(EngineServices.IsServiceReady<MyServiceDummy>("MyCustomGroup"))
+{
+}
+```
+
+### OnceServiceReady&lt;T&gt;
+Allow providing an action that will be executed once the specified service is registered.<br/>
+If the service is already registered, then the provided action will be executed immediately.
+
+#### Flags
+<CSFlagPublic/><CSFlagStatic/>
+
+#### Parameters
+- <CSType>Action&lt;T&gt;</CSType> <CSName>actionToExecute</CSName><br/>The action that will be executed once the specified service has been registered. It will be provided the service registered.
+- <OptionalType/> <CSType>string</CSType> <CSName>groupName</CSName> = <CSDefault>"default"</CSDefault><br/>The <CSName>groupName</CSName> of the service you want to check.
+#### TypeParam
+- <CSType>Type</CSType> <CSName>&lt;T&gt;</CSName><br/>
+<CSName>&lt;T&gt;</CSName> need to be a <CSConst>class</CSConst>, heriting <CSClass>IService</CSClass>.<br/>
+It will define what the <CSName>actionToExecute</CSName> will wait before being executed. It will also be provided as an argument to <CSName>actionToExecute</CSName>.
+
+#### Return: Void
+
+#### Example
+Let's imagine we have a service class declared like this:
+```CSharp
+public class MyServiceDummy : IService
+{
+    public void MyMethod()
+    {
+        Logger.Debug("Hello World!");
+    }
+}
+```
+If we can't say WHEN this service will be ready, we can do this to only use it once it's ready:
+```CSharp
+{
+
+EngineServices.OnceServiceReady((MyServiceDummy dummy) => {
+
+    // Write 'Hello World!' inside the console only
+    // When the service has been registered.
+    dummy.MyMethod();
+
+});
+
+/// If we wanted to wait for the same service, but in a different group, we can do this
+EngineServices.OnceServiceReady((MyServiceDummy dummy) => {
+
+    // Write 'Hello World!' inside the console only
+    // When the service has been registered INSIDE the 'MyCustomGroup' group.
+    dummy.MyMethod();
+
+}, "MyCustomGroup");
+
+}
+```
+
+### GetService&lt;T&gt;
+Get the service (<CSName>&lt;T&gt;</CSName>) currently registered.
+:::warning
+This method can throw `EngineCriticalException` if you try to get a service that isn't currently registered.<br/>
+We advise you to use `OnceServiceReady` method if you don't exactly know what you're doing!.
+:::
+
+#### Flags
+<CSFlagPublic/><CSFlagStatic/>
+
+#### Parameters
+- <OptionalType/> <CSType>string</CSType> <CSName>groupName</CSName> = <CSDefault>"default"</CSDefault><br/>
+The <CSName>groupName</CSName> of the service you want to check. <CSName>GroupName</CSName> are a way to have multiple same services loaded if needed.
+
+#### TypeParam
+- <CSType>Type</CSType> <CSName>&lt;T&gt;</CSName><br/>
+<CSName>&lt;T&gt;</CSName> need to be a <CSConst>class</CSConst>, heriting <CSClass>IService</CSClass>.<br/>
+This is the service that you want to get.
+
+#### Return
+- <CSType>T</CSType><br/>
+The service found inside the service provider, or an <b>EngineCriticalException</b> if the service couldn't be found!
+
+#### Example
+Let's imagine we have a service class declared like this:
+```CSharp
+public class MyServiceDummy : IService
+{
+    public void MyMethod()
+    {
+        Logger.Debug("Hello World!");
+    }
+}
+```
+And that this service <b>HAS BEEN</b> registered, we can then do that to get it:
+```CSharp
+{
+
+var myService = EngineServices.GetService<MyServiceDummy>();
+myService.MyMethod();
+
+/// If we want to get the service from another group, we can do this
+var myServiceFromAnotherGroup = EngineServices.GetService<MyServiceDummy>("MyCustomGroup");
+myServiceFromAnotherGroup.MyMethod();
+
+/// But be aware that if the service has been declared inside the "default" group,
+/// you WILL NOT be able to get it from "MyCustomGroup" and vice-versa.
+
+}
+```
+
+### RegisterService&lt;T&gt;
+This method allows you to register a custom service inside the service provider.
+:::warning
+<b>YOU CAN'T</b> register a custom service inside the 'default' group!
+:::
+
+#### Flags
+<CSFlagPublic/><CSFlagStatic/>
+
+#### Parameters
+- <CSType>T</CSType> <CSName>service</CSName><br/>
+The service instance you want to register.
+- <CSType>string</CSType> <CSName>groupName</CSName><br/>
+The group where this instance will be registered. It <b>CAN'T</b> be 'default' as this is reserved by the engine core!
+
+#### TypeParam
+- <CSType>Type</CSType> <CSName>&lt;T&gt;</CSName><br/>
+<CSName>&lt;T&gt;</CSName> need to be a <CSConst>class</CSConst>, heriting <CSClass>IService</CSClass>.<br/>
+This is the service type that you want to register.
+
+#### Return: Void
+
+#### Example
+Let's imagine we have a service class declared like this:
+```CSharp
+public class MyServiceDummy : IService
+{
+    public void MyMethod()
+    {
+        Logger.Debug("Hello World!");
+    }
+}
+```
+We can then register it inside the service provider like this:
+```CSharp
+{
+
+var myService = new MyServiceDummy();
+EngineServices.RegisterService(myService, "MyCustomGroup");
+
+// And get it like that
+EngineServices.GetService<MyServiceDummy>("MyCustomGroup").MyMethod();
+
+// or like this
+EngineServices.OnceServiceReady((MyServiceDummy dummy) => {
+
+    dummy.MyMethod();
+
+}, "MyCustomGroup");
+
+/// IF we try to do this:
+EngineService.RegisterService(myService, "default");
+/// The engine will stop, and throw an 'EngineCriticalException'.
+
+}
+```
