@@ -122,11 +122,6 @@ const config: Config = {
           label: 'Documentation',
         },
         {
-            to: '/roadmap',
-          position: 'left',
-          label: 'Roadmap',
-        },
-        {
           href: 'https://github.com/Ward727a/rpgcreator-doc',
           label: 'GitHub',
           position: 'right',
